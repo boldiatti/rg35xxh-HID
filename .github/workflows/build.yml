@@ -1,0 +1,42 @@
+name: Build RG35XXH Controller Firmware
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential git wget flex bison bc \
+            libssl-dev device-tree-compiler python3 gcc-aarch64-linux-gnu \
+            u-boot-tools cpio rsync unzip
+      
+      - name: Show directory structure
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          echo "=== Files in root ==="
+          ls -la
+          echo "=== Package directory ==="
+          ls -la package/ || echo "Package directory missing"
+          echo "=== Controller source ==="
+          ls -la package/rg35xxh-controller/src/ || echo "Controller source missing"
+      
+      - name: Make build.sh executable
+        run: chmod +x build.sh
+      
+      - name: Run build
+        run: ./build.sh
+      
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: rg35xxh-firmware
+          path: "*.img"
