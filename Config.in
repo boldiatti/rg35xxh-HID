@@ -1,0 +1,2 @@
+source "$BR2_EXTERNAL_HID_FIRMWARE_PATH/package/rg35xxh-controller/Config.in"
+source "$BR2_EXTERNAL_HID_FIRMWARE_PATH/package/rg35xxh-ui/Config.in"
