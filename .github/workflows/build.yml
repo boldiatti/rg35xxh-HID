@@ -34,8 +34,9 @@ jobs:
       
       - name: Create Buildroot config
         run: |
-          # Create a minimal defconfig for RG35XXH
+          # Create configs directory
           mkdir -p buildroot/configs
+          # Create the defconfig file
           cat > buildroot/configs/rg35xxh_defconfig << 'EOF'
           BR2_aarch64=y
           BR2_cortex_a53=y
@@ -54,6 +55,8 @@ jobs:
           BR2_PACKAGE_ALSA_LIB=y
           BR2_PACKAGE_SDL2=y
           EOF
+          # Show that file was created
+          ls -la buildroot/configs/
       
       - name: Run build
         run: |
