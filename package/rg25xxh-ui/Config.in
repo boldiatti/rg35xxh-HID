@@ -1,0 +1,6 @@
+config BR2_PACKAGE_RG35XXH_UI
+    bool "rg35xxh-ui"
+    depends on BR2_PACKAGE_SDL2
+    depends on BR2_PACKAGE_SDL2_FBCON
+    help
+      Minimal UI for RG35XXH Controller showing status and button presses.

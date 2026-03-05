@@ -1,0 +1,519 @@
+From: RG35XXH Developer <dev@rg35xxh.org>
+Date: Mon, 1 Jan 2024 12:00:00 +0000
+Subject: [PATCH] arm64: dts: allwinner: Add RG35XXH device tree
+
+Add device tree support for Anbernic RG35XXH handheld gaming device.
+
+Signed-off-by: RG35XXH Developer <dev@rg35xxh.org>
+---
+ arch/arm64/boot/dts/allwinner/Makefile          |   1 +
+ .../dts/allwinner/sun50i-h700-rg35xxh.dts       | 487 +++++++++++++++++++++
+ 2 files changed, 488 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/allwinner/sun50i-h700-rg35xxh.dts
+
+diff --git a/arch/arm64/boot/dts/allwinner/Makefile b/arch/arm64/boot/dts/allwinner/Makefile
+index 1234567..8901234 100644
+--- a/arch/arm64/boot/dts/allwinner/Makefile
++++ b/arch/arm64/boot/dts/allwinner/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-amarula-relic.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-bananapi-m64.dtb
++dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h700-rg35xxh.dtb
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h700-rg35xxh.dts b/arch/arm64/boot/dts/allwinner/sun50i-h700-rg35xxh.dts
+new file mode 100644
+index 0000000..1234567
+--- /dev/null
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h700-rg35xxh.dts
+@@ -0,0 +1,487 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright (C) 2024 RG35XXH Developers
++ *
++ * Device Tree for Anbernic RG35XXH Handheld
++ */
++
++/dts-v1/;
++
++#include "sun50i-h616.dtsi"
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++#include <dt-bindings/interrupt-controller/irq.h>
++#include <dt-bindings/pwm/pwm.h>
++
++/ {
++    model = "Anbernic RG35XXH";
++    compatible = "anbernic,rg35xxh", "allwinner,sun50i-h700";
++
++    aliases {
++        serial0 = &uart0;
++        ethernet0 = &emac;
++        mmc0 = &mmc0;
++        mmc1 = &mmc1;
++        mmc2 = &mmc2;
++        i2c0 = &i2c0;
++        i2c1 = &i2c1;
++        i2c2 = &i2c2;
++        i2c3 = &i2c3;
++        spi0 = &spi0;
++        spi1 = &spi1;
++    };
++
++    chosen {
++        stdout-path = "serial0:115200n8";
++    };
++
++    memory@40000000 {
++        device_type = "memory";
++        reg = <0x40000000 0x40000000>; /* 1GB */
++    };
++
++    backlight: backlight {
++        compatible = "pwm-backlight";
++        pwms = <&pwm 0 50000 0>;
++        brightness-levels = <0 10 20 30 40 50 60 70 80 90 100>;
++        default-brightness-level = <8>;
++        power-supply = <&reg_dldo3>;
++        enable-gpios = <&pio 2 12 GPIO_ACTIVE_HIGH>; /* PC12 */
++    };
++
++    gpio-keys {
++        compatible = "gpio-keys";
++
++        button-a {
++            label = "A";
++            gpios = <&pio 6 6 GPIO_ACTIVE_LOW>; /* PG6 */
++            linux,code = <BTN_SOUTH>;
++            wakeup-source;
++        };
++
++        button-b {
++            label = "B";
++            gpios = <&pio 6 7 GPIO_ACTIVE_LOW>; /* PG7 */
++            linux,code = <BTN_EAST>;
++            wakeup-source;
++        };
++
++        button-x {
++            label = "X";
++            gpios = <&pio 6 8 GPIO_ACTIVE_LOW>; /* PG8 */
++            linux,code = <BTN_NORTH>;
++            wakeup-source;
++        };
++
++        button-y {
++            label = "Y";
++            gpios = <&pio 6 9 GPIO_ACTIVE_LOW>; /* PG9 */
++            linux,code = <BTN_WEST>;
++            wakeup-source;
++        };
++
++        button-l1 {
++            label = "L1";
++            gpios = <&pio 6 4 GPIO_ACTIVE_LOW>; /* PG4 */
++            linux,code = <BTN_TL>;
++            wakeup-source;
++        };
++
++        button-r1 {
++            label = "R1";
++            gpios = <&pio 6 5 GPIO_ACTIVE_LOW>; /* PG5 */
++            linux,code = <BTN_TR>;
++            wakeup-source;
++        };
++
++        button-l2 {
++            label = "L2";
++            gpios = <&pio 6 2 GPIO_ACTIVE_LOW>; /* PG2 */
++            linux,code = <BTN_TL2>;
++            wakeup-source;
++        };
++
++        button-r2 {
++            label = "R2";
++            gpios = <&pio 6 3 GPIO_ACTIVE_LOW>; /* PG3 */
++            linux,code = <BTN_TR2>;
++            wakeup-source;
++        };
++
++        button-select {
++            label = "Select";
++            gpios = <&pio 6 0 GPIO_ACTIVE_LOW>; /* PG0 */
++            linux,code = <BTN_SELECT>;
++            wakeup-source;
++        };
++
++        button-start {
++            label = "Start";
++            gpios = <&pio 6 1 GPIO_ACTIVE_LOW>; /* PG1 */
++            linux,code = <BTN_START>;
++            wakeup-source;
++        };
++
++        button-home {
++            label = "Home";
++            gpios = <&pio 5 7 GPIO_ACTIVE_LOW>; /* PF7 */
++            linux,code = <BTN_MODE>;
++            wakeup-source;
++        };
++
++        button-volume-up {
++            label = "Volume Up";
++            gpios = <&pio 5 5 GPIO_ACTIVE_LOW>; /* PF5 */
++            linux,code = <KEY_VOLUMEUP>;
++        };
++
++        button-volume-down {
++            label = "Volume Down";
++            gpios = <&pio 5 6 GPIO_ACTIVE_LOW>; /* PF6 */
++            linux,code = <KEY_VOLUMEDOWN>;
++        };
++
++        sw1 {
++            label = "Power";
++            gpios = <&pio 5 4 GPIO_ACTIVE_LOW>; /* PF4 */
++            linux,code = <KEY_POWER>;
++            wakeup-source;
++        };
++    };
++
++    gpio-keys-polled {
++        compatible = "gpio-keys-polled";
++        poll-interval = <10>;
++
++        button-dpad-up {
++            label = "D-Pad Up";
++            gpios = <&pio 5 0 GPIO_ACTIVE_LOW>; /* PF0 */
++            linux,code = <BTN_DPAD_UP>;
++        };
++
++        button-dpad-down {
++            label = "D-Pad Down";
++            gpios = <&pio 5 1 GPIO_ACTIVE_LOW>; /* PF1 */
++            linux,code = <BTN_DPAD_DOWN>;
++        };
++
++        button-dpad-left {
++            label = "D-Pad Left";
++            gpios = <&pio 5 2 GPIO_ACTIVE_LOW>; /* PF2 */
++            linux,code = <BTN_DPAD_LEFT>;
++        };
++
++        button-dpad-right {
++            label = "D-Pad Right";
++            gpios = <&pio 5 3 GPIO_ACTIVE_LOW>; /* PF3 */
++            linux,code = <BTN_DPAD_RIGHT>;
++        };
++    };
++
++    /* Analog sticks via ADC */
++    adc-joystick {
++        compatible = "adc-joystick";
++        io-channels = <&ths 0>, <&ths 1>, <&ths 2>, <&ths 3>;
++        poll-interval = <10>;
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        axis@0 {
++            reg = <0>;
++            linux,code = <ABS_X>;
++            abs-range = <0 4095>;
++            abs-fuzz = <4>;
++            abs-flat = <32>;
++        };
++
++        axis@1 {
++            reg = <1>;
++            linux,code = <ABS_Y>;
++            abs-range = <0 4095>;
++            abs-fuzz = <4>;
++            abs-flat = <32>;
++        };
++
++        axis@2 {
++            reg = <2>;
++            linux,code = <ABS_RX>;
++            abs-range = <0 4095>;
++            abs-fuzz = <4>;
++            abs-flat = <32>;
++        };
++
++        axis@3 {
++            reg = <3>;
++            linux,code = <ABS_RY>;
++            abs-range = <0 4095>;
++            abs-fuzz = <4>;
++            abs-flat = <32>;
++        };
++
++        axis@4 {
++            reg = <4>;
++            linux,code = <ABS_Z>;
++            abs-range = <0 1023>;
++            abs-fuzz = <4>;
++            abs-flat = <8>;
++        };
++
++        axis@5 {
++            reg = <5>;
++            linux,code = <ABS_RZ>;
++            abs-range = <0 1023>;
++            abs-fuzz = <4>;
++            abs-flat = <8>;
++        };
++    };
++
++    /* Speaker */
++    sound_spkr {
++        compatible = "simple-audio-card";
++        simple-audio-card,name = "RG35XXH-Speaker";
++        simple-audio-card,format = "i2s";
++        simple-audio-card,frame-master = <&cpudai>;
++        simple-audio-card,bitclock-master = <&cpudai>;
++        simple-audio-card,widgets = "Speaker", "Internal Speaker";
++        simple-audio-card,routing = "Internal Speaker", "Speaker Amp OUT";
++
++        cpudai: simple-audio-card,cpu {
++            sound-dai = <&i2s1>;
++        };
++
++        link_codec: simple-audio-card,codec {
++            sound-dai = <&codec>;
++        };
++    };
++
++    /* Headphones */
++    sound_hp {
++        compatible = "simple-audio-card";
++        simple-audio-card,name = "RG35XXH-Headphones";
++        simple-audio-card,format = "i2s";
++        simple-audio-card,frame-master = <&hp_cpudai>;
++        simple-audio-card,bitclock-master = <&hp_cpudai>;
++        simple-audio-card,widgets = "Headphone", "Headphones";
++        simple-audio-card,routing = "Headphones", "HP OUT";
++
++        hp_cpudai: simple-audio-card,cpu {
++            sound-dai = <&i2s2>;
++        };
++
++        hp_link_codec: simple-audio-card,codec {
++            sound-dai = <&hp_codec>;
++        };
++    };
++
++    /* Battery */
++    battery-power-supply {
++        compatible = "gpio-charger";
++        charger-type = "mains";
++        gpios = <&pio 2 15 GPIO_ACTIVE_HIGH>; /* PC15 - Charging status */
++    };
++
++    /* Vibrator (optional) */
++    vibrator {
++        compatible = "pwm-vibrator";
++        pwms = <&pwm 1 1000000 0>;
++        pwm-names = "enable";
++        vcc-supply = <&reg_dcdc1>;
++    };
++};
++
++&cpu0 {
++    cpu-supply = <&reg_dcdc2>;
++};
++
++&cpu1 {
++    cpu-supply = <&reg_dcdc2>;
++};
++
++&cpu2 {
++    cpu-supply = <&reg_dcdc2>;
++};
++
++&cpu3 {
++    cpu-supply = <&reg_dcdc2>;
++};
++
++&mmc0 {
++    vmmc-supply = <&reg_dcdc1>;
++    vqmmc-supply = <&reg_aldo1>;
++    cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>; /* PF6 */
++    bus-width = <4>;
++    max-frequency = <50000000>;
++    status = "okay";
++};
++
++&mmc1 {
++    vmmc-supply = <&reg_dldo1>;
++    vqmmc-supply = <&reg_aldo1>;
++    bus-width = <4>;
++    max-frequency = <150000000>;
++    non-removable;
++    cap-mmc-hw-reset;
++    status = "okay";
++
++    /* WiFi/BT combo */
++    rtl8723ds: wifi@1 {
++        reg = <1>;
++        compatible = "realtek,rtl8723ds";
++        interrupt-parent = <&pio>;
++        interrupts = <6 10 IRQ_TYPE_EDGE_RISING>; /* PG10 */
++        /* BT UART */
++        bluetooth {
++            compatible = "realtek,rtl8723ds-bt";
++            device-wake-gpios = <&pio 6 11 GPIO_ACTIVE_HIGH>; /* PG11 */
++            host-wake-gpios = <&pio 6 12 GPIO_ACTIVE_HIGH>; /* PG12 */
++            enable-gpios = <&pio 6 13 GPIO_ACTIVE_HIGH>; /* PG13 */
++        };
++    };
++};
++
++&mmc2 {
++    vmmc-supply = <&reg_dcdc1>;
++    vqmmc-supply = <&reg_aldo1>;
++    bus-width = <8>;
++    max-frequency = <100000000>;
++    non-removable;
++    cap-mmc-hw-reset;
++    status = "okay";
++};
++
++&uart0 {
++    pinctrl-names = "default";
++    pinctrl-0 = <&uart0_ph_pins>;
++    status = "okay";
++};
++
++&uart1 {
++    pinctrl-names = "default";
++    pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
++    status = "okay";
++
++    bluetooth {
++        compatible = "realtek,rtl8723ds-bt";
++        device-wake-gpios = <&pio 6 11 GPIO_ACTIVE_HIGH>;
++        host-wake-gpios = <&pio 6 12 GPIO_ACTIVE_HIGH>;
++        enable-gpios = <&pio 6 13 GPIO_ACTIVE_HIGH>;
++        max-speed = <3000000>;
++    };
++};
++
++&i2c0 {
++    pinctrl-names = "default";
++    pinctrl-0 = <&i2c0_pins>;
++    status = "okay";
++
++    /* Touchscreen (if present) */
++    ft6236: touchscreen@38 {
++        compatible = "focaltech,ft6236";
++        reg = <0x38>;
++        interrupt-parent = <&pio>;
++        interrupts = <1 0 IRQ_TYPE_EDGE_FALLING>; /* PB0 */
++        reset-gpios = <&pio 1 1 GPIO_ACTIVE_LOW>; /* PB1 */
++        touchscreen-size-x = <640>;
++        touchscreen-size-y = <480>;
++    };
++};
++
++&i2c2 {
++    pinctrl-names = "default";
++    pinctrl-0 = <&i2c2_pins>;
++    status = "okay";
++
++    /* PMIC */
++    axp22x: pmic@34 {
++        compatible = "x-powers,axp221";
++        reg = <0x34>;
++        interrupt-parent = <&pio>;
++        interrupts = <2 17 IRQ_TYPE_LEVEL_LOW>; /* PC17 */
++        interrupt-controller;
++        #interrupt-cells = <1>;
++        x-powers,drive-vbus-en;
++
++        regulators {
++            reg_dcdc1: dcdc1 {
++                regulator-name = "vcc-3v3";
++                regulator-min-microvolt = <3300000>;
++                regulator-max-microvolt = <3300000>;
++                regulator-always-on;
++            };
++
++            reg_dcdc2: dcdc2 {
++                regulator-name = "vdd-cpu";
++                regulator-min-microvolt = <700000>;
++                regulator-max-microvolt = <1100000>;
++                regulator-ramp-delay = <200>;
++                regulator-always-on;
++            };
++
++            reg_dcdc3: dcdc3 {
++                regulator-name = "vdd-gpu";
++                regulator-min-microvolt = <900000>;
++                regulator-max-microvolt = <1100000>;
++                regulator-ramp-delay = <200>;
++            };
++
++            reg_aldo1: aldo1 {
++                regulator-name = "vcc-pll";
++                regulator-min-microvolt = <1800000>;
++                regulator-max-microvolt = <1800000>;
++                regulator-always-on;
++            };
++
++            reg_aldo2: aldo2 {
++                regulator-name = "vcc-mipi";
++                regulator-min-microvolt = <1800000>;
++                regulator-max-microvolt = <1800000>;
++            };
++
++            reg_dldo1: dldo1 {
++                regulator-name = "vcc-wifi-io";
++                regulator-min-microvolt = <1800000>;
++                regulator-max-microvolt = <3300000>;
++            };
++
++            reg_dldo3: dldo3 {
++                regulator-name = "vcc-lcd";
++                regulator-min-microvolt = <3300000>;
++                regulator-max-microvolt = <3300000>;
++            };
++        };
++    };
++};
++
++&ths {
++    #thermal-sensor-cells = <0>;
++    nvmem-cells = <&ths_calib>;
++    nvmem-cell-names = "calibration";
++};
++
++&pwm {
++    pinctrl-names = "default";
++    pinctrl-0 = <&pwm0_pin>, <&pwm1_pin>;
++    status = "okay";
++};
++
++&ehci0 {
++    status = "okay";
++};
++
++&ohci0 {
++    status = "okay";
++};
++
++&usbphy {
++    status = "okay";
++};
++
++&usbotg {
++    dr_mode = "otg";
++    status = "okay";
++};
++
++&ehci1 {
++    status = "okay";
++};
++
++&ohci1 {
++    status = "okay";
++};

@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# S99controller - Start controller daemon and UI
+
+case "$1" in
+    start)
+        echo "Starting RG35XXH Controller daemon..."
+        
+        # Set up Bluetooth
+        if [ -e /sys/class/bluetooth ]; then
+            echo 0 > /sys/class/bluetooth/hci0/scan 2>/dev/null
+            hciconfig hci0 up 2>/dev/null
+            hciconfig hci0 piscan 2>/dev/null
+            hciconfig hci0 noauth 2>/dev/nulla
+        fi
+        
+        # Set up USB gadget
+        if [ -e /sys/kernel/config/usb_gadget ]; then
+            mount -t configfs none /sys/kernel/config
+            # USB gadget will be set up by controller daemon
+        fi
+        
+        # Start the controller daemon
+        /usr/bin/rg35xxh-controller &
+        
+        # Start the UI (on framebuffer)
+        /usr/bin/rg35xxh-ui &
+        ;;
+    
+    stop)
+        echo "Stopping RG35XXH Controller daemon..."
+        killall rg35xxh-controller
+        killall rg35xxh-ui
+        
+        # Clean up USB gadget
+        if [ -d /sys/kernel/config/usb_gadget/g1 ]; then
+            echo "" > /sys/kernel/config/usb_gadget/g1/UDC 2>/dev/null
+            rm -f /sys/kernel/config/usb_gadget/g1/configs/c.1/hid.usb0 2>/dev/null
+            rmdir /sys/kernel/config/usb_gadget/g1/configs/c.1 2>/dev/null
+            rmdir /sys/kernel/config/usb_gadget/g1/functions/hid.usb0 2>/dev/null
+            rmdir /sys/kernel/config/usb_gadget/g1/strings/0x409 2>/dev/null
+            rmdir /sys/kernel/config/usb_gadget/g1/configs/c.1/strings/0x409 2>/dev/null
+            rmdir /sys/kernel/config/usb_gadget/g1 2>/dev/null
+        fi
+        ;;
+    
+    restart)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+    
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0

@@ -1,0 +1,2 @@
+source "$BR2_EXTERNAL_RG35XXH_PATH/package/rg35xxh-controller/Config.in"
+source "$BR2_EXTERNAL_RG35XXH_PATH/package/rg35xxh-ui/Config.in"
